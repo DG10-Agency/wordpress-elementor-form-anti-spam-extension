@@ -1,0 +1,111 @@
+# Copyright (C) 2024 DG10
+# This file is distributed under the same license as the DG10 Elementor Form Anti-Spam plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: DG10 Elementor Form Anti-Spam 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/dg10-elementor-form-anti-spam\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2024-03-20T12:00:00+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.8.1\n"
+"X-Domain: dg10-antispam\n"
+
+#. Plugin Name of the plugin
+msgid "DG10 Elementor Form Anti-Spam"
+msgstr ""
+
+#. Plugin URI of the plugin
+msgid "https://example.com/dg10-elementor-form-anti-spam"
+msgstr ""
+
+#. Description of the plugin
+msgid "Advanced anti-spam protection for Elementor forms with intelligent validation, honeypot fields, and customizable settings."
+msgstr ""
+
+#. Author of the plugin
+msgid "DG10"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://example.com"
+msgstr ""
+
+#: includes/class-admin.php:24
+msgid "DG10 Anti-Spam Settings"
+msgstr ""
+
+#: includes/class-admin.php:25
+msgid "DG10 Anti-Spam"
+msgstr ""
+
+#: includes/class-settings.php:45
+msgid "Form Validation Settings"
+msgstr ""
+
+#: includes/class-settings.php:52
+msgid "Minimum Name Length"
+msgstr ""
+
+#: includes/class-settings.php:60
+msgid "Max Submissions per Hour"
+msgstr ""
+
+#: includes/class-settings.php:68
+msgid "Enable Honeypot"
+msgstr ""
+
+#: includes/class-settings.php:76
+msgid "Enable Time-based Check"
+msgstr ""
+
+#: includes/class-settings.php:84
+msgid "Enable Spam Keyword Filter"
+msgstr ""
+
+#: includes/class-settings.php:92
+msgid "Custom Error Message"
+msgstr ""
+
+#: includes/class-form-validator.php:156
+msgid "Invalid form submission detected."
+msgstr ""
+
+#: dg10-elementor-silent-validation.php:108
+msgid "Anti-Spam Protection"
+msgstr ""
+
+#: dg10-elementor-silent-validation.php:134
+msgid "DG10 Elementor Form Anti-Spam requires Elementor Pro to be installed and activated. Please %s install Elementor Pro %s to continue."
+msgstr ""
+
+#: includes/class-admin.php:89
+msgid "Usage Statistics"
+msgstr ""
+
+#: includes/class-admin.php:90
+msgid "Spam Attempts Blocked"
+msgstr ""
+
+#: includes/class-admin.php:91
+msgid "Forms Protected"
+msgstr ""
+
+#: includes/class-admin.php:95
+msgid "Quick Tips"
+msgstr ""
+
+#: includes/class-admin.php:97
+msgid "Enable honeypot for better bot protection"
+msgstr ""
+
+#: includes/class-admin.php:98
+msgid "Adjust submission limits based on your traffic"
+msgstr ""
+
+#: includes/class-admin.php:99
+msgid "Customize error messages for better user experience"
+msgstr ""

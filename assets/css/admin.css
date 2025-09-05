@@ -1,0 +1,94 @@
+.dg10-admin-container {
+    margin-top: 20px;
+}
+
+.dg10-admin-content {
+    display: flex;
+    gap: 30px;
+}
+
+.dg10-admin-container form {
+    flex: 2;
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.dg10-admin-sidebar {
+    flex: 1;
+    max-width: 300px;
+}
+
+/* Support both legacy and current box class names */
+.dg10-admin-box,
+.dg10-box {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.dg10-admin-box h3,
+.dg10-box h3 {
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    color: #23282d;
+}
+
+.dg10-admin-box ul,
+.dg10-box ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.dg10-admin-box li,
+.dg10-box li {
+    margin-bottom: 8px;
+    color: #666;
+}
+
+/* Logo styling */
+.dg10-logo {
+    height: 40px;
+    margin: 10px 10px 0 0;
+    vertical-align: middle;
+}
+
+.form-table th {
+    padding: 20px 10px;
+}
+
+.regular-text {
+    width: 100%;
+    max-width: 400px;
+}
+
+.dg10-admin-container .submit {
+    padding: 15px 0 0 0;
+    margin: 0;
+}
+
+/* Custom styling for number inputs */
+input[type="number"] {
+    width: 100px;
+}
+
+/* Custom styling for checkboxes */
+input[type="checkbox"] {
+    margin-top: 5px;
+}
+
+/* Error message styling */
+.error-message {
+    color: #dc3232;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+/* Success message styling */
+.updated {
+    margin: 20px 0;
+}
