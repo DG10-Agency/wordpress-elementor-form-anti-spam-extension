@@ -161,8 +161,17 @@ class DG10_Admin {
                         <div class="dg10-actions">
                             <a class="dg10-cta-button is-primary" href="https://www.dg10.agency" target="_blank" rel="noopener">
                                 <?php esc_html_e('Visit Website', 'dg10-antispam'); ?>
+                                <svg class="icon icon-right" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                                    <path d="M13 5l7 7-7 7M5 12h14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
                             </a>
-                            <a class="dg10-cta-button is-outline" href="https://www.dg10.agency/contact" target="_blank" rel="noopener">
+                            <a class="dg10-cta-button is-outline" href="https://calendly.com/dg10-agency/30min" target="_blank" rel="noopener">
+                                <svg class="icon icon-left" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                                    <path d="M7 2v3M17 2v3M3 9h18M5 6h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <rect x="7" y="13" width="3" height="3" rx="0.5" />
+                                    <rect x="12" y="13" width="3" height="3" rx="0.5" />
+                                    <rect x="17" y="13" width="3" height="3" rx="0.5" />
+                                </svg>
                                 <?php esc_html_e('Book a Free Consultation', 'dg10-antispam'); ?>
                             </a>
                         </div>
