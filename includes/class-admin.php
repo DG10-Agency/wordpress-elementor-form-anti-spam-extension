@@ -76,6 +76,9 @@ class DG10_Admin {
                     <span class="sub"><?php esc_html_e('Agency', 'dg10-antispam'); ?></span>
                 </div>
                 <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+                <?php if ($has_pro): ?>
+                    <span class="dg10-chip dg10-chip-pro"><?php esc_html_e('Pro', 'dg10-antispam'); ?></span>
+                <?php endif; ?>
             </div>
 
             <div class="dg10-mode-notice <?php echo $has_pro ? 'is-pro' : 'is-lite'; ?>">
