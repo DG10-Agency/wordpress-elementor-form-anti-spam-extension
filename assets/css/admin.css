@@ -57,6 +57,22 @@
     vertical-align: middle;
 }
 
+/* Optional branded header pill for the logo area if needed in the future */
+.dg10-brand-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    color: #ffffff;
+    background: linear-gradient(90deg, #ff7fc2 0%, #b47cfd 100%);
+}
+.dg10-brand-pill .sub {
+    font-size: 12px;
+    opacity: 0.9;
+}
+
 .form-table th {
     padding: 20px 10px;
 }
@@ -108,21 +124,30 @@ input[type="checkbox"] {
     vertical-align: middle;
 }
 
-/* Mode notice banner */
+/* Mode notice banner - branded */
 .dg10-mode-notice {
+    position: relative;
     margin: 15px 0 25px;
-    padding: 12px 16px;
-    border-left: 4px solid #72aee6; /* default info */
-    background: #f0f6fc; /* light info */
-    border-radius: 3px;
+    padding: 12px 16px 12px 20px;
+    border: 1px solid rgba(180, 124, 253, 0.25); /* #b47cfd */
+    background: linear-gradient(90deg, rgba(255, 127, 194, 0.08) 0%, rgba(180, 124, 253, 0.08) 100%); /* #ff7fc2 -> #b47cfd */
+    border-radius: 6px;
 }
-.dg10-mode-notice.is-pro {
-    border-left-color: #00a32a; /* WP green */
-    background: #f0fff4;
+.dg10-mode-notice::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background: linear-gradient(180deg, #ff7fc2 0%, #b47cfd 100%);
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
 }
+/* Unify Pro/Lite variants under brand styling */
+.dg10-mode-notice.is-pro,
 .dg10-mode-notice.is-lite {
-    border-left-color: #d63638; /* WP red */
-    background: #fff5f5;
+    /* Intentionally left to inherit branded styling */
 }
 .dg10-mode-notice .dg10-badge-pro {
     margin-left: 8px;
