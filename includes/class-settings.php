@@ -35,7 +35,10 @@ class DG10_Settings {
                 'enable_gemini' => false,
                 'deepseek_api_key' => '',
                 'gemini_api_key' => '',
-                'custom_error_message' => 'Invalid form submission detected.'
+                'custom_error_message' => 'Invalid form submission detected.',
+                // Lite Mode defaults
+                'enable_lite_mode' => false,
+                'lite_form_selector' => ''
             ]);
         }
     }
@@ -57,6 +60,32 @@ class DG10_Settings {
 
         $this->add_basic_fields();
 
+        // Lite Mode Section
+        add_settings_section(
+            'dg10_antispam_lite',
+            __('Lite Mode (Elementor Free)', 'dg10-antispam'),
+            [$this, 'render_lite_section_description'],
+            'dg10-antispam'
+        );
+
+        add_settings_field(
+            'enable_lite_mode',
+            __('Enable Lite Mode for non-Elementor forms', 'dg10-antispam'),
+            [$this, 'render_checkbox_field'],
+            'dg10-antispam',
+            'dg10_antispam_lite',
+            ['field' => 'enable_lite_mode']
+        );
+
+        add_settings_field(
+            'lite_form_selector',
+            __('Lite Mode Form Selector (CSS)', 'dg10-antispam'),
+            [$this, 'render_text_field'],
+            'dg10-antispam',
+            'dg10_antispam_lite',
+            ['field' => 'lite_form_selector']
+        );
+
         // AI Settings Section
         add_settings_section(
             'dg10_antispam_ai',
@@ -76,7 +105,7 @@ class DG10_Settings {
                 'args' => ['min' => 2, 'max' => 50]
             ],
             'max_submissions_per_hour' => [
-                'title' => __('Max Submissions per Hour', 'dg10-antispam'),
+                'title' => __('Max Submissions per Hour', 'dg10-antispam') . ' <span class="dg10-badge-pro">Pro</span>',
                 'callback' => 'render_number_field',
                 'args' => ['min' => 1, 'max' => 100]
             ],
@@ -89,7 +118,7 @@ class DG10_Settings {
                 'callback' => 'render_checkbox_field'
             ],
             'enable_spam_keywords' => [
-                'title' => __('Enable Spam Keyword Filter', 'dg10-antispam'),
+                'title' => __('Enable Spam Keyword Filter', 'dg10-antispam') . ' <span class="dg10-badge-pro">Pro</span>',
                 'callback' => 'render_checkbox_field'
             ],
             'custom_error_message' => [
@@ -113,19 +142,19 @@ class DG10_Settings {
     private function add_ai_fields() {
         $ai_fields = [
             'enable_deepseek' => [
-                'title' => __('Enable DeepSeek AI', 'dg10-antispam'),
+                'title' => __('Enable DeepSeek AI', 'dg10-antispam') . ' <span class="dg10-badge-pro">Pro</span>',
                 'callback' => 'render_checkbox_field'
             ],
             'deepseek_api_key' => [
-                'title' => __('DeepSeek API Key', 'dg10-antispam'),
+                'title' => __('DeepSeek API Key', 'dg10-antispam') . ' <span class="dg10-badge-pro">Pro</span>',
                 'callback' => 'render_api_key_field'
             ],
             'enable_gemini' => [
-                'title' => __('Enable Gemini AI', 'dg10-antispam'),
+                'title' => __('Enable Gemini AI', 'dg10-antispam') . ' <span class="dg10-badge-pro">Pro</span>',
                 'callback' => 'render_checkbox_field'
             ],
             'gemini_api_key' => [
-                'title' => __('Gemini API Key', 'dg10-antispam'),
+                'title' => __('Gemini API Key', 'dg10-antispam') . ' <span class="dg10-badge-pro">Pro</span>',
                 'callback' => 'render_api_key_field'
             ]
         ];
@@ -144,6 +173,10 @@ class DG10_Settings {
 
     public function render_ai_section_description() {
         echo '<p>' . esc_html__('Configure AI-powered spam detection using DeepSeek and Gemini. You need to provide API keys to enable these features.', 'dg10-antispam') . '</p>';
+    }
+
+    public function render_lite_section_description() {
+        echo '<p>' . esc_html__('Lite Mode applies client-side validation (honeypot, time, basic field checks) to selected forms. For server-side enforcement, IP rate limiting, and AI, activate Elementor Pro.', 'dg10-antispam') . '</p>';
     }
 
     public function render_number_field($args) {
@@ -206,18 +239,22 @@ class DG10_Settings {
         $sanitized = [];
 
         // Basic settings
-        $sanitized['min_name_length'] = absint($input['min_name_length']);
-        $sanitized['max_submissions_per_hour'] = absint($input['max_submissions_per_hour']);
+        $sanitized['min_name_length'] = absint(isset($input['min_name_length']) ? $input['min_name_length'] : 2);
+        $sanitized['max_submissions_per_hour'] = absint(isset($input['max_submissions_per_hour']) ? $input['max_submissions_per_hour'] : 5);
         $sanitized['enable_honeypot'] = isset($input['enable_honeypot']);
         $sanitized['enable_time_check'] = isset($input['enable_time_check']);
         $sanitized['enable_spam_keywords'] = isset($input['enable_spam_keywords']);
-        $sanitized['custom_error_message'] = sanitize_text_field($input['custom_error_message']);
+        $sanitized['custom_error_message'] = sanitize_text_field(isset($input['custom_error_message']) ? $input['custom_error_message'] : '');
+
+        // Lite settings
+        $sanitized['enable_lite_mode'] = isset($input['enable_lite_mode']);
+        $sanitized['lite_form_selector'] = sanitize_text_field(isset($input['lite_form_selector']) ? $input['lite_form_selector'] : '');
 
         // AI settings
         $sanitized['enable_deepseek'] = isset($input['enable_deepseek']);
         $sanitized['enable_gemini'] = isset($input['enable_gemini']);
-        $sanitized['deepseek_api_key'] = sanitize_text_field($input['deepseek_api_key']);
-        $sanitized['gemini_api_key'] = sanitize_text_field($input['gemini_api_key']);
+        $sanitized['deepseek_api_key'] = sanitize_text_field(isset($input['deepseek_api_key']) ? $input['deepseek_api_key'] : '');
+        $sanitized['gemini_api_key'] = sanitize_text_field(isset($input['gemini_api_key']) ? $input['gemini_api_key'] : '');
 
         return $sanitized;
     }
@@ -228,7 +265,10 @@ class DG10_Settings {
             'enable_honeypot' => $this->get_option('enable_honeypot', true),
             'enable_time_check' => $this->get_option('enable_time_check', true),
             'min_submission_time' => 3000,
-            'custom_error_message' => $this->get_option('custom_error_message', 'Invalid form submission detected.')
+            'custom_error_message' => $this->get_option('custom_error_message', 'Invalid form submission detected.'),
+            // Lite exposure
+            'enable_lite_mode' => $this->get_option('enable_lite_mode', false),
+            'lite_form_selector' => $this->get_option('lite_form_selector', '')
         ];
     }
 }

@@ -14,7 +14,17 @@
         }
 
         setupFormValidation() {
-            const forms = document.querySelectorAll('.elementor-form');
+            // Collect targets: Elementor forms and optional Lite selector
+            const selectors = ['.elementor-form'];
+            if (this.settings && this.settings.enable_lite_mode && typeof this.settings.lite_form_selector === 'string' && this.settings.lite_form_selector.trim().length > 0) {
+                selectors.push(this.settings.lite_form_selector.trim());
+            }
+
+            // Query and deduplicate forms
+            const forms = Array.from(new Set(
+                selectors.flatMap(sel => Array.from(document.querySelectorAll(sel)))
+            ));
+
             if (!forms.length) return;
 
             forms.forEach(form => {
@@ -165,16 +175,22 @@
         }
 
         showError(form, message) {
-            const errorDiv = form.querySelector('.elementor-message-danger') || document.createElement('div');
-            errorDiv.className = 'elementor-message elementor-message-danger';
-            errorDiv.textContent = message;
-
-            if (!form.contains(errorDiv)) {
+            // Prefer Elementor error container if present, else fall back to a generic message box
+            let errorDiv = form.querySelector('.elementor-message-danger');
+            if (!errorDiv) {
+                errorDiv = document.createElement('div');
+                errorDiv.className = 'elementor-message elementor-message-danger';
+                errorDiv.setAttribute('role', 'alert');
+                errorDiv.textContent = message;
                 form.prepend(errorDiv);
+            } else {
+                errorDiv.textContent = message;
             }
 
             setTimeout(() => {
-                errorDiv.remove();
+                if (errorDiv && errorDiv.parentNode === form) {
+                    errorDiv.remove();
+                }
             }, 5000);
         }
 

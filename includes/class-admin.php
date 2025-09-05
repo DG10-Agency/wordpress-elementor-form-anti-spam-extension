@@ -66,10 +66,36 @@ class DG10_Admin {
 
         $blocked_attempts = $this->get_blocked_attempts();
         $protected_forms = $this->get_protected_forms();
+        $has_pro = class_exists('\\ElementorPro\\Plugin');
+        $lite_enabled = (bool) $this->settings->get_option('enable_lite_mode', false);
         ?>
         <div class="wrap dg10-admin-container">
             <img class="dg10-logo" src="<?php echo esc_url(DG10_PLUGIN_URL . 'assets/images/logo.svg'); ?>" alt="<?php echo esc_attr__('DG10 Agency', 'dg10-antispam'); ?>">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+
+            <div class="dg10-mode-notice <?php echo $has_pro ? 'is-pro' : 'is-lite'; ?>">
+                <?php if ($has_pro): ?>
+                    <p>
+                        <strong><?php esc_html_e('Pro mode active', 'dg10-antispam'); ?>.</strong>
+                        <?php esc_html_e('Server-side validation, IP throttling, and AI checks are enabled for Elementor Pro forms.', 'dg10-antispam'); ?>
+                        <?php esc_html_e('Lite Mode options apply to non-Elementor forms on the site.', 'dg10-antispam'); ?>
+                        <span class="dg10-badge-pro"><?php esc_html_e('Pro', 'dg10-antispam'); ?></span>
+                    </p>
+                <?php else: ?>
+                    <p>
+                        <strong><?php esc_html_e('Lite mode active', 'dg10-antispam'); ?>.</strong>
+                        <?php esc_html_e('Using client-side checks (honeypot, time, basic validation). Features marked', 'dg10-antispam'); ?>
+                        <span class="dg10-badge-pro"><?php esc_html_e('Pro', 'dg10-antispam'); ?></span>
+                        <?php esc_html_e('require Elementor Pro hooks.', 'dg10-antispam'); ?>
+                        <a href="<?php echo esc_url(admin_url('plugin-install.php?tab=plugin-information&plugin=elementor-pro')); ?>" target="_blank" rel="noopener">
+                            <?php esc_html_e('Get Elementor Pro', 'dg10-antispam'); ?>
+                        </a>
+                    </p>
+                <?php endif; ?>
+                <?php if (!$has_pro && !$lite_enabled): ?>
+                    <p class="description"><?php esc_html_e('Tip: Enable Lite Mode below and set a CSS selector to protect your non-Elementor forms.', 'dg10-antispam'); ?></p>
+                <?php endif; ?>
+            </div>
             
             <div class="dg10-admin-content">
                 <div class="dg10-admin-main">
