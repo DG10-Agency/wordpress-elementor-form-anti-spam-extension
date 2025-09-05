@@ -72,7 +72,7 @@ class DG10_Admin {
         <div class="wrap dg10-admin-container">
             <div class="dg10-header">
                 <div class="dg10-brand-pill">
-                    <span class="main">DG10</span>
+                    <img class="dg10-logo-icon" src="<?php echo esc_url(DG10_PLUGIN_URL . 'assets/images/logo.svg'); ?>" alt="<?php echo esc_attr__('DG10', 'dg10-antispam'); ?>">
                     <span class="sub"><?php esc_html_e('Agency', 'dg10-antispam'); ?></span>
                 </div>
                 <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
@@ -144,10 +144,13 @@ class DG10_Admin {
                     <div class="dg10-box dg10-about">
                         <div class="dg10-about-header">
                             <div class="dg10-brand-pill">
-                                <span class="main">DG10</span>
+                                <img class="dg10-logo-icon" src="<?php echo esc_url(DG10_PLUGIN_URL . 'assets/images/logo.svg'); ?>" alt="<?php echo esc_attr__('DG10', 'dg10-antispam'); ?>">
                                 <span class="sub"><?php esc_html_e('Agency', 'dg10-antispam'); ?></span>
                             </div>
                             <h3><?php _e('About DG10', 'dg10-antispam'); ?></h3>
+                            <?php if ($has_pro): ?>
+                                <span class="dg10-chip dg10-chip-pro"><?php esc_html_e('Pro', 'dg10-antispam'); ?></span>
+                            <?php endif; ?>
                         </div>
                         <p>
                             <?php echo esc_html__(
@@ -163,6 +166,16 @@ class DG10_Admin {
                                 <?php esc_html_e('Book a Free Consultation', 'dg10-antispam'); ?>
                             </a>
                         </div>
+                        <p class="description">
+                            <?php
+                            printf(
+                                /* translators: 1: open anchor, 2: close anchor */
+                                esc_html__('This is an open‑source project — please %1$sstar the repo on GitHub%2$s.', 'dg10-antispam'),
+                                '<a href="https://github.com/DG10-Agency/wordpress-elementor-form-anti-spam-extension" target="_blank" rel="noopener">',
+                                '</a>'
+                            );
+                            ?>
+                        </p>
                         <ul class="dg10-link-list">
                             <li>
                                 <a href="https://github.com/DG10-Agency/wordpress-elementor-form-anti-spam-extension" target="_blank" rel="noopener">
