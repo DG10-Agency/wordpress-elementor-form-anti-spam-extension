@@ -58,12 +58,16 @@ class DG10_Elementor_Silent_Validation {
 
     public function init_plugin() {
         $this->load_textdomain();
+
+        // Initialize components for both Pro and Lite modes
+        $this->init_components();
+
+        // Show admin notice if Elementor Pro is missing (Lite mode)
         if (!$this->check_elementor_pro()) {
             add_action('admin_notices', [$this, 'elementor_pro_missing_notice']);
-            return;
         }
 
-        $this->init_components();
+        // Register hooks (conditionally for Pro where needed)
         $this->init_hooks();
     }
 
@@ -80,16 +84,24 @@ class DG10_Elementor_Silent_Validation {
     }
 
     private function init_hooks() {
-        add_action('elementor_pro/forms/validation', [$this->form_validator, 'validate_form'], 10, 2);
-        add_action('elementor_pro/forms/process', [$this->ip_manager, 'log_submission'], 10, 2);
+        // Register Elementor Pro-only hooks if Pro is active
+        if ($this->check_elementor_pro()) {
+            add_action('elementor_pro/forms/validation', [$this, 'delegate_validate_form'], 10, 2);
+            add_action('elementor_pro/forms/process', [$this->ip_manager, 'log_submission'], 10, 2);
+        }
+
+        // Always enqueue frontend scripts (Lite mode works client-side only)
         add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
     }
 
-    public function enqueue_scripts() {
-        if (!class_exists('\\ElementorPro\\Plugin')) {
-            return;
+    // Small delegator to keep reference consistent if Pro is present
+    public function delegate_validate_form($record, $ajax_handler) {
+        if ($this->form_validator) {
+            $this->form_validator->validate_form($record, $ajax_handler);
         }
+    }
 
+    public function enqueue_scripts() {
         wp_enqueue_script(
             'dg10-form-validation',
             DG10_PLUGIN_URL . 'assets/js/form-validation.js',
@@ -101,7 +113,9 @@ class DG10_Elementor_Silent_Validation {
         wp_localize_script('dg10-form-validation', 'dg10Data', [
             'ajaxurl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('dg10_validation'),
-            'settings' => $this->settings->get_frontend_settings(),
+            'settings' => $this->settings ? $this->settings->get_frontend_settings() : [],
+            // Gate server-side validation features to Elementor Pro only
+            'enableAjaxValidation' => $this->check_elementor_pro(),
         ]);
     }
 
@@ -115,11 +129,11 @@ class DG10_Elementor_Silent_Validation {
         }
 
         $message = sprintf(
-            esc_html__('DG10 Elementor Form Anti-Spam requires Elementor Pro to be installed and activated. Please %s to continue.', 'dg10-antispam'),
-            '<a href="' . esc_url(admin_url('plugin-install.php?tab=plugin-information&plugin=elementor-pro')) . '">install Elementor Pro</a>'
+            esc_html__('DG10 Elementor Form Anti-Spam is running in Lite mode. To access server-side validation and advanced features (uses Elementor Pro hooks), please %s.', 'dg10-antispam'),
+            '<a href="' . esc_url(admin_url('plugin-install.php?tab=plugin-information&plugin=elementor-pro')) . '">install/activate Elementor Pro</a>'
         );
 
-        printf('<div class="notice notice-warning"><p>%s</p></div>', $message);
+        printf('<div class="notice notice-info"><p>%s</p></div>', $message);
     }
 
     public function activate() {
