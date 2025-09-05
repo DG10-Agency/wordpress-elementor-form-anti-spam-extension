@@ -141,19 +141,40 @@ class DG10_Admin {
                         </ul>
                     </div>
 
-                    <div class="dg10-box">
-                        <h3><?php _e('About', 'dg10-antispam'); ?></h3>
+                    <div class="dg10-box dg10-about">
+                        <div class="dg10-about-header">
+                            <div class="dg10-brand-pill">
+                                <span class="main">DG10</span>
+                                <span class="sub"><?php esc_html_e('Agency', 'dg10-antispam'); ?></span>
+                            </div>
+                            <h3><?php _e('About DG10', 'dg10-antispam'); ?></h3>
+                        </div>
                         <p>
-                            <?php
-                            echo wp_kses_post(
-                                sprintf(
-                                    /* translators: 1: DG10 Agency link */
-                                    __('This plugin is developed by %1$s — please hire us for WordPress development.', 'dg10-antispam'),
-                                    '<a href="https://www.dg10.agency" target="_blank" rel="noopener">DG10 Agency</a>'
-                                )
-                            );
-                            ?>
+                            <?php echo esc_html__(
+                                'DG10 Agency crafts high‑performance WordPress and Elementor solutions. Need help with custom development, optimization, or complex integrations?',
+                                'dg10-antispam'
+                            ); ?>
                         </p>
+                        <div class="dg10-actions">
+                            <a class="dg10-cta-button is-primary" href="https://www.dg10.agency" target="_blank" rel="noopener">
+                                <?php esc_html_e('Visit Website', 'dg10-antispam'); ?>
+                            </a>
+                            <a class="dg10-cta-button is-outline" href="https://www.dg10.agency/contact" target="_blank" rel="noopener">
+                                <?php esc_html_e('Book a Free Consultation', 'dg10-antispam'); ?>
+                            </a>
+                        </div>
+                        <ul class="dg10-link-list">
+                            <li>
+                                <a href="https://github.com/DG10-Agency/wordpress-elementor-form-anti-spam-extension" target="_blank" rel="noopener">
+                                    <?php esc_html_e('Plugin repository', 'dg10-antispam'); ?>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.dg10.agency/#work" target="_blank" rel="noopener">
+                                    <?php esc_html_e('See our work', 'dg10-antispam'); ?>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>

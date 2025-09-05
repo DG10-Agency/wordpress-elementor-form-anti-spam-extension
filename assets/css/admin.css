@@ -33,9 +33,59 @@
 .dg10-admin-box h3,
 .dg10-box h3 {
     margin-top: 0;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eee;
-    color: #23282d;
+}
+
+/* About box enhancements */
+.dg10-about .dg10-about-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+.dg10-actions {
+    display: flex;
+    gap: 8px;
+    margin: 10px 0 8px;
+}
+.dg10-cta-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    text-decoration: none;
+    transition: transform .06s ease, box-shadow .2s ease, background .2s ease;
+    border: 1px solid rgba(0,0,0,0.06);
+}
+.dg10-cta-button.is-primary {
+    color: #ffffff;
+    background: linear-gradient(90deg, #ff7fc2 0%, #b47cfd 100%);
+    box-shadow: 0 2px 8px rgba(180,124,253,0.25);
+}
+.dg10-cta-button.is-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(180,124,253,0.35);
+}
+.dg10-cta-button.is-outline {
+    color: #5b2bb2;
+    background: #ffffff;
+    border-color: #e9e3f7;
+}
+.dg10-cta-button.is-outline:hover {
+    background: #faf6ff;
+}
+.dg10-link-list {
+    margin: 8px 0 0;
+    padding-left: 16px;
+}
+.dg10-link-list a {
+    color: #5b2bb2;
+}
+.dg10-link-list a:hover {
+    text-decoration: underline;
+}
 }
 
 .dg10-admin-box ul,
