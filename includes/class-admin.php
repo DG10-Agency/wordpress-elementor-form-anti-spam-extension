@@ -70,8 +70,13 @@ class DG10_Admin {
         $lite_enabled = (bool) $this->settings->get_option('enable_lite_mode', false);
         ?>
         <div class="wrap dg10-admin-container">
-            <img class="dg10-logo" src="<?php echo esc_url(DG10_PLUGIN_URL . 'assets/images/logo.svg'); ?>" alt="<?php echo esc_attr__('DG10 Agency', 'dg10-antispam'); ?>">
-            <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+            <div class="dg10-header">
+                <div class="dg10-brand-pill">
+                    <span class="main">DG10</span>
+                    <span class="sub"><?php esc_html_e('Agency', 'dg10-antispam'); ?></span>
+                </div>
+                <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+            </div>
 
             <div class="dg10-mode-notice <?php echo $has_pro ? 'is-pro' : 'is-lite'; ?>">
                 <?php if ($has_pro): ?>

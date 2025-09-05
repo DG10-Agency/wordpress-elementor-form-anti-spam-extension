@@ -58,19 +58,30 @@
 }
 
 /* Optional branded header pill for the logo area if needed in the future */
+.dg10-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 10px 0 16px;
+}
+.dg10-header h1 {
+    margin: 0;
+}
 .dg10-brand-pill {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 6px 10px;
-    border-radius: 8px;
-    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
     color: #ffffff;
     background: linear-gradient(90deg, #ff7fc2 0%, #b47cfd 100%);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08), 0 4px 10px rgba(180,124,253,0.15);
 }
 .dg10-brand-pill .sub {
     font-size: 12px;
-    opacity: 0.9;
+    opacity: 0.95;
 }
 
 .form-table th {
