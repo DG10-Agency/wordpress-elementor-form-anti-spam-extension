@@ -276,4 +276,4 @@ input[type="checkbox"] {
 .dg10-header .dg10-logo { height: 40px; margin: 0 10px 0 0; }
 .dg10-about .dg10-about-header .dg10-logo { height: 32px; margin: 0 8px 0 0; }
 .dg10-actions { width: 100%; }
-.dg10-cta-button { width: 100%; box-sizing: border-box; min-width: 0; }
+.dg10-cta-button { width: 100%; box-sizing: border-box; min-width: 0; white-space: normal; }
