@@ -73,7 +73,6 @@ class DG10_Admin {
             <div class="dg10-header">
                 <div class="dg10-brand-pill">
                     <img class="dg10-logo-icon" src="<?php echo esc_url(DG10_PLUGIN_URL . 'assets/images/logo.svg'); ?>" alt="<?php echo esc_attr__('DG10', 'dg10-antispam'); ?>">
-                    <span class="sub"><?php esc_html_e('Agency', 'dg10-antispam'); ?></span>
                 </div>
                 <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
                 <?php if ($has_pro): ?>
@@ -145,9 +144,8 @@ class DG10_Admin {
                         <div class="dg10-about-header">
                             <div class="dg10-brand-pill">
                                 <img class="dg10-logo-icon" src="<?php echo esc_url(DG10_PLUGIN_URL . 'assets/images/logo.svg'); ?>" alt="<?php echo esc_attr__('DG10', 'dg10-antispam'); ?>">
-                                <span class="sub"><?php esc_html_e('Agency', 'dg10-antispam'); ?></span>
                             </div>
-                            <h3><?php _e('About DG10', 'dg10-antispam'); ?></h3>
+                            <h3><?php _e('About us', 'dg10-antispam'); ?></h3>
                             <?php if ($has_pro): ?>
                                 <span class="dg10-chip dg10-chip-pro"><?php esc_html_e('Pro', 'dg10-antispam'); ?></span>
                             <?php endif; ?>
@@ -185,18 +183,7 @@ class DG10_Admin {
                             );
                             ?>
                         </p>
-                        <ul class="dg10-link-list">
-                            <li>
-                                <a href="https://github.com/DG10-Agency/wordpress-elementor-form-anti-spam-extension" target="_blank" rel="noopener">
-                                    <?php esc_html_e('Plugin repository', 'dg10-antispam'); ?>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="https://www.dg10.agency/#work" target="_blank" rel="noopener">
-                                    <?php esc_html_e('See our work', 'dg10-antispam'); ?>
-                                </a>
-                            </li>
-                        </ul>
+
                     </div>
                 </div>
             </div>
