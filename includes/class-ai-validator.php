@@ -33,7 +33,7 @@ class DG10_AI_Validator {
 
         // If any AI model detects spam, return false and update stats
         $is_spam = in_array(false, $results, true);
-        $this->update_ai_stats(1, $is_spam ? 1 : 0);
+        $this->update_ai_stats($is_spam);
         return !$is_spam;
     }
 
