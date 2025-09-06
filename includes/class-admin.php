@@ -180,6 +180,19 @@ class DG10_Admin {
         <?php
     }
 
+    public function ajax_get_stats() {
+        check_ajax_referer('dg10_admin', 'nonce');
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => __('Unauthorized', 'dg10-antispam')], 403);
+        }
+        $blocked = $this->get_blocked_attempts();
+        $forms = $this->get_protected_forms();
+        wp_send_json_success([
+            'blocked' => intval($blocked),
+            'forms' => is_array($forms) ? count($forms) : 0
+        ]);
+    }
+
     private function get_blocked_attempts() {
         return intval(get_option('dg10_blocked_attempts', 0));
     }
