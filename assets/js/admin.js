@@ -46,37 +46,7 @@
             }
         });
 
-        // Add AJAX form submission
-        $('form').on('submit', function(e) {
-            e.preventDefault();
-            const form = $(this);
-            const submitButton = form.find('input[type="submit"]');
-            const originalText = submitButton.val();
-
-            submitButton.val('Saving...').prop('disabled', true);
-
-            $.ajax({
-                url: ajaxurl,
-                type: 'POST',
-                data: form.serialize() + '&action=dg10_save_settings',
-                success: function(response) {
-                    if (response.success) {
-                        form.before('<div class="updated"><p>Settings saved successfully!</p></div>');
-                        setTimeout(function() {
-                            $('.updated').fadeOut();
-                        }, 3000);
-                    } else {
-                        form.before('<div class="error"><p>Error saving settings. Please try again.</p></div>');
-                    }
-                },
-                error: function() {
-                    form.before('<div class="error"><p>Error saving settings. Please try again.</p></div>');
-                },
-                complete: function() {
-                    submitButton.val(originalText).prop('disabled', false);
-                }
-            });
-        });
+        // Form submits via WordPress Settings API (options.php); no AJAX interception needed.
 
         // Add live statistics update
         function updateStats() {
