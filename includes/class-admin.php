@@ -152,7 +152,7 @@ class DG10_Admin {
                         </div>
                         <p>
                             <?php echo esc_html__(
-                                'DG10 Agency crafts high‑performance WordPress and Elementor solutions. Need help with custom development, optimization, or complex integrations?',
+                                'We craft high‑performance WordPress and Elementor solutions. Need help with custom development, optimization, or complex integrations?',
                                 'dg10-antispam'
                             ); ?>
                         </p>
