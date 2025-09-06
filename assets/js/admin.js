@@ -50,22 +50,26 @@
 
         // Add live statistics update
         function updateStats() {
+            var url = (window.dg10AdminData && window.dg10AdminData.ajaxurl) ? window.dg10AdminData.ajaxurl : (typeof ajaxurl !== 'undefined' ? ajaxurl : '');
+            if (!url) { return; }
             $.ajax({
-                url: ajaxurl,
+                url: url,
                 type: 'POST',
                 data: {
-                    action: 'dg10_get_stats'
+                    action: 'dg10_get_stats',
+                    nonce: (window.dg10AdminData && window.dg10AdminData.nonce) ? window.dg10AdminData.nonce : ''
                 },
                 success: function(response) {
-                    if (response.success) {
-                        $('#blocked-attempts').text(response.data.blocked);
-                        $('#protected-forms').text(response.data.forms);
+                    if (response && response.success && response.data) {
+                        $('#dg10-blocked-attempts').text(response.data.blocked);
+                        $('#dg10-protected-forms').text(response.data.forms);
                     }
                 }
             });
         }
 
-        // Update stats every 5 minutes
+        // Initial call and update stats every 5 minutes
+        updateStats();
         setInterval(updateStats, 300000);
     });
 })(jQuery);
