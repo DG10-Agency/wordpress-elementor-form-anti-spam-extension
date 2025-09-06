@@ -29,6 +29,14 @@ class DG10_Form_Validator {
         // Correct Elementor record API
         $fields = $record->get('fields');
         $form_name = $record->get_form_settings('form_name');
+        // Track protected forms (unique by form_name)
+        if (!empty($form_name)) {
+            $forms = (array) get_option('dg10_protected_forms', []);
+            if (!in_array($form_name, $forms, true)) {
+                $forms[] = $form_name;
+                update_option('dg10_protected_forms', $forms);
+            }
+        }
 
         // IP-based rate limiting
         $ip_manager = DG10_IP_Manager::get_instance();

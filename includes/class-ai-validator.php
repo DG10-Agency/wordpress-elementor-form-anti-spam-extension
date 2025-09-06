@@ -31,8 +31,10 @@ class DG10_AI_Validator {
             $results[] = $this->check_with_gemini($form_data);
         }
 
-        // If any AI model detects spam, return false
-        return !in_array(false, $results, true);
+        // If any AI model detects spam, return false and update stats
+        $is_spam = in_array(false, $results, true);
+        $this->update_ai_stats(1, $is_spam ? 1 : 0);
+        return !$is_spam;
     }
 
     private function check_with_deepseek($form_data) {

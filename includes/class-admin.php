@@ -17,6 +17,7 @@ class DG10_Admin {
         add_action('admin_menu', [$this, 'add_admin_menu']);
         add_action('admin_init', [$this, 'init_settings']);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
+        add_action('wp_ajax_dg10_get_stats', [$this, 'ajax_get_stats']);
     }
 
     public function add_admin_menu() {
@@ -140,7 +141,7 @@ class DG10_Admin {
                         </div>
                         <p>
                             <?php echo esc_html__(
-                                'We craft high‑performance WordPress and Elementor solutions. Need help with custom development, optimization, or complex integrations?',
+                                'We craft high‑performance WordPress, Elementor and other digital solutions. Please visit website to check our services Need help with custom development, optimization, or complex integrations?',
                                 'dg10-antispam'
                             ); ?>
                         </p>
