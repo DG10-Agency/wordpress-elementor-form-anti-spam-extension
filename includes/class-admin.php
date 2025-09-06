@@ -71,13 +71,8 @@ class DG10_Admin {
         ?>
         <div class="wrap dg10-admin-container">
             <div class="dg10-header">
-                <div class="dg10-brand-pill">
-                    <img class="dg10-logo-icon" src="<?php echo esc_url(DG10_PLUGIN_URL . 'assets/images/logo.svg'); ?>" alt="<?php echo esc_attr__('DG10', 'dg10-antispam'); ?>">
-                </div>
+                <img class="dg10-logo" src="<?php echo esc_url(DG10_PLUGIN_URL . 'assets/images/logo.svg'); ?>" alt="<?php echo esc_attr__('DG10', 'dg10-antispam'); ?>">
                 <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-                <?php if ($has_pro): ?>
-                    <span class="dg10-chip dg10-chip-pro"><?php esc_html_e('Pro', 'dg10-antispam'); ?></span>
-                <?php endif; ?>
             </div>
 
             <div class="dg10-mode-notice <?php echo $has_pro ? 'is-pro' : 'is-lite'; ?>">
@@ -91,9 +86,7 @@ class DG10_Admin {
                 <?php else: ?>
                     <p>
                         <strong><?php esc_html_e('Lite mode active', 'dg10-antispam'); ?>.</strong>
-                        <?php esc_html_e('Using client-side checks (honeypot, time, basic validation). Features marked', 'dg10-antispam'); ?>
-                        <span class="dg10-badge-pro"><?php esc_html_e('Pro', 'dg10-antispam'); ?></span>
-                        <?php esc_html_e('require Elementor Pro hooks.', 'dg10-antispam'); ?>
+                        <?php esc_html_e('Using client-side checks (honeypot, time, basic validation). Features marked require Elementor Pro hooks.', 'dg10-antispam'); ?>
                         <a href="<?php echo esc_url(admin_url('plugin-install.php?tab=plugin-information&plugin=elementor-pro')); ?>" target="_blank" rel="noopener">
                             <?php esc_html_e('Get Elementor Pro', 'dg10-antispam'); ?>
                         </a>
@@ -142,13 +135,8 @@ class DG10_Admin {
 
                     <div class="dg10-box dg10-about">
                         <div class="dg10-about-header">
-                            <div class="dg10-brand-pill">
-                                <img class="dg10-logo-icon" src="<?php echo esc_url(DG10_PLUGIN_URL . 'assets/images/logo.svg'); ?>" alt="<?php echo esc_attr__('DG10', 'dg10-antispam'); ?>">
-                            </div>
+                            <img class="dg10-logo" src="<?php echo esc_url(DG10_PLUGIN_URL . 'assets/images/logo.svg'); ?>" alt="<?php echo esc_attr__('DG10', 'dg10-antispam'); ?>">
                             <h3><?php _e('About us', 'dg10-antispam'); ?></h3>
-                            <?php if ($has_pro): ?>
-                                <span class="dg10-chip dg10-chip-pro"><?php esc_html_e('Pro', 'dg10-antispam'); ?></span>
-                            <?php endif; ?>
                         </div>
                         <p>
                             <?php echo esc_html__(
