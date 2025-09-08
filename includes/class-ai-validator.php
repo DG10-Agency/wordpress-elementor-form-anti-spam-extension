@@ -66,11 +66,28 @@ class DG10_AI_Validator {
         ]);
 
         if (is_wp_error($response)) {
-            error_log('DeepSeek API Error: ' . $response->get_error_message());
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('DeepSeek API Error: ' . $response->get_error_message());
+            }
+            return true; // Allow submission on API error
+        }
+
+        $response_code = wp_remote_retrieve_response_code($response);
+        if ($response_code !== 200) {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('DeepSeek API HTTP Error: ' . $response_code);
+            }
             return true; // Allow submission on API error
         }
 
         $body = json_decode(wp_remote_retrieve_body($response), true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('DeepSeek API JSON Error: ' . json_last_error_msg());
+            }
+            return true; // Allow submission on JSON error
+        }
+        
         $result = isset($body['choices'][0]['message']['content']) ? $body['choices'][0]['message']['content'] : '';
         
         return trim($result) !== 'SPAM';
@@ -106,11 +123,28 @@ class DG10_AI_Validator {
         ]);
 
         if (is_wp_error($response)) {
-            error_log('Gemini API Error: ' . $response->get_error_message());
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('Gemini API Error: ' . $response->get_error_message());
+            }
+            return true; // Allow submission on API error
+        }
+
+        $response_code = wp_remote_retrieve_response_code($response);
+        if ($response_code !== 200) {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('Gemini API HTTP Error: ' . $response_code);
+            }
             return true; // Allow submission on API error
         }
 
         $body = json_decode(wp_remote_retrieve_body($response), true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('Gemini API JSON Error: ' . json_last_error_msg());
+            }
+            return true; // Allow submission on JSON error
+        }
+        
         $result = isset($body['candidates'][0]['content']['parts'][0]['text']) ? $body['candidates'][0]['content']['parts'][0]['text'] : '';
         
         return trim($result) !== 'SPAM';
@@ -125,10 +159,10 @@ class DG10_AI_Validator {
             $prompt .= "Field type: {$field_type}\nContent: {$field_value}\n";
         }
 
-        // Add submission context
+        // Add submission context (sanitized)
         $prompt .= "\nSubmission context:\n";
-        $prompt .= "IP: " . $_SERVER['REMOTE_ADDR'] . "\n";
-        $prompt .= "User Agent: " . $_SERVER['HTTP_USER_AGENT'] . "\n";
+        $prompt .= "IP: " . $this->get_safe_ip() . "\n";
+        $prompt .= "User Agent: " . $this->get_safe_user_agent() . "\n";
         $prompt .= "Timestamp: " . current_time('mysql') . "\n";
 
         return $prompt;
@@ -147,5 +181,26 @@ class DG10_AI_Validator {
 
         update_option('dg10_ai_total_checks', $total_checks);
         update_option('dg10_ai_spam_detected', $spam_detected);
+    }
+
+    private function get_safe_ip() {
+        $ip = '';
+        if (!empty($_SERVER['REMOTE_ADDR'])) {
+            $ip = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP);
+        }
+        if (!$ip && !empty($_SERVER['HTTP_CLIENT_IP'])) {
+            $ip = filter_var($_SERVER['HTTP_CLIENT_IP'], FILTER_VALIDATE_IP);
+        }
+        if (!$ip && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ip = filter_var($_SERVER['HTTP_X_FORWARDED_FOR'], FILTER_VALIDATE_IP);
+        }
+        return $ip ?: 'unknown';
+    }
+
+    private function get_safe_user_agent() {
+        if (!empty($_SERVER['HTTP_USER_AGENT'])) {
+            return sanitize_text_field(substr($_SERVER['HTTP_USER_AGENT'], 0, 200));
+        }
+        return 'unknown';
     }
 }

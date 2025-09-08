@@ -122,13 +122,14 @@
         validatePhoneFields(form) {
             const phoneInputs = form.querySelectorAll('input[type="tel"]');
             return Array.from(phoneInputs).every(input => {
-                const phone = input.value.trim().replace(/[^0-9]/g, '');
+                const phone = input.value.trim().replace(/[^0-9+]/g, '').replace(/^\+/, '');
                 const spamPhones = [
                     '1234567890', '0000000000', '1111111111', '2222222222',
                     '3333333333', '4444444444', '5555555555', '6666666666',
                     '7777777777', '8888888888', '9999999999'
                 ];
-                return /^[6-9]\d{9}$/.test(phone) && !spamPhones.includes(phone);
+                // More flexible phone validation - accepts 7-15 digits
+                return /^[0-9]{7,15}$/.test(phone) && !spamPhones.includes(phone);
             });
         }
 

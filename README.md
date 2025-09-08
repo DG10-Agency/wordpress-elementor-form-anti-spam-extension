@@ -5,7 +5,7 @@ Advanced anti-spam protection for Elementor forms with intelligent validation, h
 ## Features
 
 - **Advanced Field Validation**
-  - Phone number validation with spam number detection
+  - Phone number validation with spam number detection (supports international formats)
   - Email validation with spam TLD filtering
   - Name field validation with minimum length requirements
   - Custom validation rules for different field types
@@ -14,7 +14,13 @@ Advanced anti-spam protection for Elementor forms with intelligent validation, h
   - Honeypot fields to catch automated submissions
   - Time-based submission validation
   - Spam keyword filtering
-  - IP-based rate limiting
+  - IP-based rate limiting with database persistence
+  - AI-powered spam detection (DeepSeek & Gemini)
+
+- **Dual Mode Operation**
+  - **Pro Mode**: Full server-side validation for Elementor Pro users
+  - **Lite Mode**: Client-side validation for Elementor Free users
+  - Automatic detection and graceful degradation
 
 - **Customizable Settings**
   - Minimum name length configuration
@@ -23,23 +29,28 @@ Advanced anti-spam protection for Elementor forms with intelligent validation, h
   - Enable/disable time-based checks
   - Enable/disable spam keyword filtering
   - Custom error messages
+  - AI API key configuration
 
 - **Performance Optimized**
   - Efficient client-side validation
-  - Minimal database queries
+  - Minimal database queries with proper indexing
   - Lightweight and fast processing
+  - Automatic cleanup of old data
 
 - **Developer Friendly**
   - Clean, well-documented code
   - WordPress coding standards compliant
   - Extensible architecture
   - Hooks and filters for customization
+  - Comprehensive error handling
 
 ## Requirements
 
 - WordPress 5.0 or higher
 - PHP 7.2 or higher
-- Elementor Pro (latest version recommended)
+- Elementor (Free or Pro)
+  - **Pro Mode**: Elementor Pro for full server-side validation
+  - **Lite Mode**: Elementor Free for client-side validation
 
 ## Installation
 
@@ -52,11 +63,23 @@ Advanced anti-spam protection for Elementor forms with intelligent validation, h
 ### General Settings
 
 - **Minimum Name Length**: Set the minimum required length for name fields (default: 2)
-- **Max Submissions per Hour**: Limit the number of form submissions from a single IP (default: 5)
+- **Max Submissions per Hour**: Limit the number of form submissions from a single IP (default: 5) - Pro Mode only
 - **Enable Honeypot**: Add hidden fields to catch automated submissions
 - **Enable Time Check**: Validate submission timing to prevent rapid submissions
-- **Enable Spam Keywords**: Filter submissions containing known spam keywords
+- **Enable Spam Keywords**: Filter submissions containing known spam keywords - Pro Mode only
 - **Custom Error Message**: Set your own error message for invalid submissions
+
+### AI Settings (Pro Mode)
+
+- **Enable DeepSeek AI**: Use DeepSeek AI for advanced spam detection
+- **DeepSeek API Key**: Your DeepSeek API key for AI validation
+- **Enable Gemini AI**: Use Google Gemini AI for spam detection
+- **Gemini API Key**: Your Google Gemini API key
+
+### Lite Mode Settings
+
+- **Enable Lite Mode**: Activate client-side validation for non-Elementor forms
+- **Lite Mode Form Selector**: CSS selector for forms to protect (e.g., `#contact-form`)
 
 ### Usage
 

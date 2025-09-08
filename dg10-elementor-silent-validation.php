@@ -9,7 +9,11 @@
  * Text Domain: dg10-antispam
  * Domain Path: /languages
  * Requires at least: 5.0
+ * Tested up to: 6.4
  * Requires PHP: 7.2
+ * License: GPL v2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Network: false
  */
 
 if (!defined('ABSPATH')) exit;
@@ -92,12 +96,56 @@ class DG10_Elementor_Silent_Validation {
 
         // Always enqueue frontend scripts (Lite mode works client-side only)
         add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
+        
+        // Add AJAX handler for frontend validation
+        add_action('wp_ajax_dg10_validate_form', [$this, 'ajax_validate_form']);
+        add_action('wp_ajax_nopriv_dg10_validate_form', [$this, 'ajax_validate_form']);
     }
 
     // Small delegator to keep reference consistent if Pro is present
     public function delegate_validate_form($record, $ajax_handler) {
         if ($this->form_validator) {
             $this->form_validator->validate_form($record, $ajax_handler);
+        }
+    }
+
+    public function ajax_validate_form() {
+        // Verify nonce for security
+        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'dg10_validation')) {
+            wp_send_json_error(['message' => __('Security check failed.', 'dg10-antispam')], 403);
+        }
+
+        // Basic validation for Lite mode
+        $is_valid = true;
+        $errors = [];
+
+        // Check honeypot
+        if ($this->settings->get_option('enable_honeypot', true) && !empty($_POST['dg10_hp_check'])) {
+            $is_valid = false;
+            $errors[] = __('Honeypot field detected.', 'dg10-antispam');
+        }
+
+        // Check submission time
+        if ($this->settings->get_option('enable_time_check', true)) {
+            $submission_time = absint($_POST['dg10_submission_time'] ?? 0);
+            $current_time = time() * 1000;
+            $min_time = 3000; // 3 seconds minimum
+            
+            if (($current_time - $submission_time) < $min_time) {
+                $is_valid = false;
+                $errors[] = __('Submission too fast.', 'dg10-antispam');
+            }
+        }
+
+        // Update statistics if invalid
+        if (!$is_valid) {
+            update_option('dg10_blocked_attempts', intval(get_option('dg10_blocked_attempts', 0)) + 1);
+        }
+
+        if ($is_valid) {
+            wp_send_json_success(['message' => __('Form validation passed.', 'dg10-antispam')]);
+        } else {
+            wp_send_json_error(['message' => implode(' ', $errors)], 400);
         }
     }
 
@@ -137,6 +185,11 @@ class DG10_Elementor_Silent_Validation {
     }
 
     public function activate() {
+        // Initialize default settings
+        $this->settings = DG10_Settings::get_instance();
+        $this->settings->set_default_options();
+
+        // Initialize statistics options
         if (!get_option('dg10_blocked_attempts')) {
             add_option('dg10_blocked_attempts', 0);
         }
@@ -145,10 +198,24 @@ class DG10_Elementor_Silent_Validation {
             add_option('dg10_protected_forms', []);
         }
 
+        // Initialize AI statistics
+        if (!get_option('dg10_ai_total_checks')) {
+            add_option('dg10_ai_total_checks', 0);
+        }
+
+        if (!get_option('dg10_ai_spam_detected')) {
+            add_option('dg10_ai_spam_detected', 0);
+        }
+
         flush_rewrite_rules();
     }
 
     public function deactivate() {
+        // Clean up old submissions on deactivation
+        if ($this->ip_manager) {
+            $this->ip_manager->clean_old_submissions();
+        }
+        
         flush_rewrite_rules();
     }
 }

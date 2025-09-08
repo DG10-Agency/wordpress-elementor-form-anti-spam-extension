@@ -126,8 +126,19 @@ class DG10_Form_Validator {
     }
 
     private function validate_phone($phone) {
-        $phone = preg_replace('/[^0-9]/', '', (string) $phone);
-        return preg_match('/^[6-9]\d{9}$/', $phone) && !in_array($phone, $this->spam_phones, true);
+        $phone = preg_replace('/[^0-9+]/', '', (string) $phone);
+        
+        // Remove leading + if present
+        $phone = ltrim($phone, '+');
+        
+        // Check for spam numbers
+        if (in_array($phone, $this->spam_phones, true)) {
+            return false;
+        }
+        
+        // More flexible phone validation - accepts 7-15 digits
+        // This covers most international formats
+        return preg_match('/^[0-9]{7,15}$/', $phone);
     }
 
     private function validate_email($email) {
