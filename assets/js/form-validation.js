@@ -122,7 +122,8 @@
         validatePhoneFields(form) {
             const phoneInputs = form.querySelectorAll('input[type="tel"]');
             return Array.from(phoneInputs).every(input => {
-                const phone = input.value.trim().replace(/[^0-9+]/g, '').replace(/^\+/, '');
+                // Sanitize phone input
+                const phone = this.sanitizePhoneNumber(input.value);
                 const spamPhones = [
                     '1234567890', '0000000000', '1111111111', '2222222222',
                     '3333333333', '4444444444', '5555555555', '6666666666',
@@ -133,20 +134,47 @@
             });
         }
 
+        /**
+         * Sanitize phone number input
+         */
+        sanitizePhoneNumber(phone) {
+            if (typeof phone !== 'string') {
+                return '';
+            }
+            
+            // Remove all non-numeric characters except +
+            return phone.trim().replace(/[^0-9+]/g, '').replace(/^\+/, '');
+        }
+
         validateNameFields(form) {
             const nameInputs = form.querySelectorAll('input[name*="name"][type="text"]');
-            const minLength = this.settings.min_name_length || 2;
+            const minLength = Math.max(1, Math.min(50, parseInt(this.settings.min_name_length) || 2));
 
             return Array.from(nameInputs).every(input => {
-                const name = input.value.trim();
-                return name.length >= minLength && /^[A-Za-z\s]+$/.test(name);
+                const name = this.sanitizeName(input.value);
+                return name.length >= minLength && /^[A-Za-z\s\-'\.]+$/.test(name);
             });
+        }
+
+        /**
+         * Sanitize name input
+         */
+        sanitizeName(name) {
+            if (typeof name !== 'string') {
+                return '';
+            }
+            
+            // Remove potentially dangerous characters and limit length
+            return name.trim()
+                .replace(/[<>]/g, '') // Remove < and >
+                .replace(/javascript:/gi, '') // Remove javascript: protocol
+                .substring(0, 100); // Limit length
         }
 
         validateEmailFields(form) {
             const emailInputs = form.querySelectorAll('input[type="email"]');
             return Array.from(emailInputs).every(input => {
-                const email = input.value.trim();
+                const email = this.sanitizeEmail(input.value);
                 if (!/^[^@]+@[^@]+\.[a-zA-Z]{2,}$/.test(email)) return false;
 
                 const domain = email.split('@')[1];
@@ -155,37 +183,82 @@
             });
         }
 
+        /**
+         * Sanitize email input
+         */
+        sanitizeEmail(email) {
+            if (typeof email !== 'string') {
+                return '';
+            }
+            
+            // Remove potentially dangerous characters and limit length
+            return email.trim()
+                .replace(/[<>]/g, '') // Remove < and >
+                .replace(/javascript:/gi, '') // Remove javascript: protocol
+                .substring(0, 254); // RFC 5321 limit
+        }
+
         async validateWithServer(form) {
             try {
+                // Validate required data exists
+                if (!window.dg10Data || !window.dg10Data.ajaxurl || !window.dg10Data.nonce) {
+                    console.error('DG10: Missing required validation data');
+                    return false;
+                }
+
                 const formData = new FormData(form);
                 formData.append('action', 'dg10_validate_form');
                 formData.append('nonce', window.dg10Data.nonce);
 
+                // Add timeout to prevent hanging requests
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
                 const response = await fetch(window.dg10Data.ajaxurl, {
                     method: 'POST',
                     body: formData,
-                    credentials: 'same-origin'
+                    credentials: 'same-origin',
+                    signal: controller.signal
                 });
 
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const result = await response.json();
+                
+                // Validate response structure
+                if (typeof result !== 'object' || result === null) {
+                    throw new Error('Invalid response format');
+                }
+
                 return result.success === true;
             } catch (error) {
-                console.error('DG10 Form validation error:', error);
+                if (error.name === 'AbortError') {
+                    console.error('DG10: Form validation request timed out');
+                } else {
+                    console.error('DG10 Form validation error:', error.message || error);
+                }
                 return false;
             }
         }
 
         showError(form, message) {
+            // Sanitize error message to prevent XSS
+            const sanitizedMessage = this.sanitizeMessage(message);
+            
             // Prefer Elementor error container if present, else fall back to a generic message box
             let errorDiv = form.querySelector('.elementor-message-danger');
             if (!errorDiv) {
                 errorDiv = document.createElement('div');
                 errorDiv.className = 'elementor-message elementor-message-danger';
                 errorDiv.setAttribute('role', 'alert');
-                errorDiv.textContent = message;
+                errorDiv.textContent = sanitizedMessage;
                 form.prepend(errorDiv);
             } else {
-                errorDiv.textContent = message;
+                errorDiv.textContent = sanitizedMessage;
             }
 
             setTimeout(() => {
@@ -193,6 +266,22 @@
                     errorDiv.remove();
                 }
             }, 5000);
+        }
+
+        /**
+         * Sanitize message to prevent XSS
+         */
+        sanitizeMessage(message) {
+            if (typeof message !== 'string') {
+                return 'Invalid form submission detected.';
+            }
+            
+            // Remove potentially dangerous characters
+            return message
+                .replace(/[<>]/g, '') // Remove < and >
+                .replace(/javascript:/gi, '') // Remove javascript: protocol
+                .replace(/on\w+=/gi, '') // Remove event handlers
+                .substring(0, 500); // Limit length
         }
 
         setupAjaxValidation() {

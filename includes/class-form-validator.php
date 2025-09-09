@@ -41,7 +41,9 @@ class DG10_Form_Validator {
         // IP-based rate limiting
         $ip_manager = DG10_IP_Manager::get_instance();
         $ip = $ip_manager->get_client_ip();
-        $max_per_hour = absint($this->settings->get_option('max_submissions_per_hour', 5));
+        $max_per_hour = isset($_POST['_dg10_runtime_max_per_hour'])
+            ? absint(sanitize_text_field($_POST['_dg10_runtime_max_per_hour']))
+            : absint($this->settings->get_option('max_submissions_per_hour', 5));
         if ($ip && $max_per_hour > 0) {
             $ip_manager->clean_old_submissions();
             if ($ip_manager->is_submission_rate_exceeded($ip, $max_per_hour)) {
@@ -49,6 +51,28 @@ class DG10_Form_Validator {
                 return;
             }
         }
+
+        // Geographic blocking
+        if ($ip) {
+            $geo_blocker = DG10_Geographic_Blocker::get_instance();
+            if ($geo_blocker->is_ip_blocked_by_geography($ip)) {
+                $this->add_error($ajax_handler);
+                return;
+            }
+        }
+
+        // Time-based rules
+        $time_rules = DG10_Time_Rules::get_instance();
+        if ($time_rules->is_submission_blocked_by_time()) {
+            $time_based_rules = $time_rules->get_time_based_rules();
+            $error_message = $time_based_rules['custom_error_message'] ?? 'Submissions are currently restricted.';
+            $this->add_error($ajax_handler, $error_message);
+            return;
+        }
+
+        // Apply time-based rule overrides to current runtime only
+        $time_based_rules = $time_rules->get_time_based_rules();
+        $this->apply_time_based_rules($time_based_rules);
 
         // Check honeypot
         if ($this->settings->get_option('enable_honeypot', true) && !$this->validate_honeypot()) {
@@ -91,7 +115,9 @@ class DG10_Form_Validator {
 
                     case 'text':
                     case 'name':
-                        if (is_string($field_value) && strlen(trim($field_value)) < $this->settings->get_option('min_name_length', 2)) {
+                        $runtimeMinLen = isset($_POST['_dg10_runtime_min_name_length']) ? absint(sanitize_text_field($_POST['_dg10_runtime_min_name_length'])) : null;
+                        $minLen = $runtimeMinLen !== null ? $runtimeMinLen : $this->settings->get_option('min_name_length', 2);
+                        if (is_string($field_value) && strlen(trim($field_value)) < $minLen) {
                             $this->add_error($ajax_handler);
                             return;
                         }
@@ -101,8 +127,12 @@ class DG10_Form_Validator {
         }
 
         // AI Validation
-        if (($this->settings->get_option('enable_deepseek', false) || 
-             $this->settings->get_option('enable_gemini', false)) && 
+        $runtimeEnableAI = isset($_POST['_dg10_runtime_enable_ai']) ? (bool) sanitize_text_field($_POST['_dg10_runtime_enable_ai']) : null;
+        $enableAI = is_bool($runtimeEnableAI) ? $runtimeEnableAI : (
+            $this->settings->get_option('enable_deepseek', false) || $this->settings->get_option('enable_gemini', false)
+        );
+
+        if ($enableAI && 
             !$this->ai_validator->validate_with_ai($fields)) {
             $this->add_error($ajax_handler);
             return;
@@ -110,15 +140,17 @@ class DG10_Form_Validator {
     }
 
     private function validate_honeypot() {
-        return !isset($_POST['dg10_hp_check']) || empty($_POST['dg10_hp_check']);
+        $honeypot_value = sanitize_text_field($_POST['dg10_hp_check'] ?? '');
+        return empty($honeypot_value);
     }
 
     private function validate_submission_time() {
-        if (!isset($_POST['dg10_submission_time'])) {
+        $submission_time_raw = $_POST['dg10_submission_time'] ?? '';
+        if (empty($submission_time_raw)) {
             return false;
         }
 
-        $submission_time = absint($_POST['dg10_submission_time']);
+        $submission_time = absint(sanitize_text_field($submission_time_raw));
         $current_time = time() * 1000; // Convert to milliseconds
         $min_time = 3000; // 3 seconds minimum
 
@@ -166,11 +198,30 @@ class DG10_Form_Validator {
         return false;
     }
 
-    private function add_error($ajax_handler) {
-        $message = $this->settings->get_option('custom_error_message', 'Invalid form submission detected.');
+    private function add_error($ajax_handler, $custom_message = null) {
+        $message = $custom_message ?: $this->settings->get_option('custom_error_message', 'Invalid form submission detected.');
         $ajax_handler->add_error_message($message);
 
         // Update statistics
         update_option('dg10_blocked_attempts', intval(get_option('dg10_blocked_attempts', 0)) + 1);
+    }
+
+    /**
+     * Apply time-based rule overrides
+     */
+    private function apply_time_based_rules($time_based_rules) {
+        // Apply overrides to in-memory properties used during this validation only
+        if (isset($time_based_rules['max_submissions_per_hour'])) {
+            $_POST['_dg10_runtime_max_per_hour'] = absint(sanitize_text_field($time_based_rules['max_submissions_per_hour']));
+        }
+        if (isset($time_based_rules['enable_ai_validation'])) {
+            $_POST['_dg10_runtime_enable_ai'] = (bool) sanitize_text_field($time_based_rules['enable_ai_validation']);
+        }
+        if (isset($time_based_rules['enable_geographic_blocking'])) {
+            $_POST['_dg10_runtime_enable_geo'] = (bool) sanitize_text_field($time_based_rules['enable_geographic_blocking']);
+        }
+        if (isset($time_based_rules['min_name_length'])) {
+            $_POST['_dg10_runtime_min_name_length'] = absint(sanitize_text_field($time_based_rules['min_name_length']));
+        }
     }
 }

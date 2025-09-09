@@ -43,7 +43,17 @@ class DG10_AI_Validator {
             return true; // Skip validation if no API key
         }
 
+        // Sanitize API key
+        $api_key = sanitize_text_field($api_key);
+        
+        // Rate limiting check
+        if (!$this->check_rate_limit('deepseek')) {
+            return true; // Allow submission if rate limited
+        }
+
         $prompt = $this->prepare_ai_prompt($form_data);
+        
+        // Add timeout and proper error handling
         $response = wp_remote_post($this->deepseek_endpoint, [
             'headers' => [
                 'Authorization' => 'Bearer ' . $api_key,
@@ -62,33 +72,29 @@ class DG10_AI_Validator {
                     ]
                 ],
                 'temperature' => 0.1
-            ])
+            ]),
+            'timeout' => 30,
+            'sslverify' => true
         ]);
 
         if (is_wp_error($response)) {
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('DeepSeek API Error: ' . $response->get_error_message());
-            }
+            $this->log_api_error('DeepSeek', $response->get_error_message());
             return true; // Allow submission on API error
         }
 
         $response_code = wp_remote_retrieve_response_code($response);
         if ($response_code !== 200) {
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('DeepSeek API HTTP Error: ' . $response_code);
-            }
+            $this->log_api_error('DeepSeek', 'HTTP Error: ' . $response_code);
             return true; // Allow submission on API error
         }
 
         $body = json_decode(wp_remote_retrieve_body($response), true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('DeepSeek API JSON Error: ' . json_last_error_msg());
-            }
+            $this->log_api_error('DeepSeek', 'JSON Error: ' . json_last_error_msg());
             return true; // Allow submission on JSON error
         }
         
-        $result = isset($body['choices'][0]['message']['content']) ? $body['choices'][0]['message']['content'] : '';
+        $result = isset($body['choices'][0]['message']['content']) ? sanitize_text_field($body['choices'][0]['message']['content']) : '';
         
         return trim($result) !== 'SPAM';
     }
@@ -99,8 +105,18 @@ class DG10_AI_Validator {
             return true; // Skip validation if no API key
         }
 
+        // Sanitize API key
+        $api_key = sanitize_text_field($api_key);
+        
+        // Rate limiting check
+        if (!$this->check_rate_limit('gemini')) {
+            return true; // Allow submission if rate limited
+        }
+
         $prompt = $this->prepare_ai_prompt($form_data);
-        $response = wp_remote_post($this->gemini_endpoint . '?key=' . $api_key, [
+        
+        // Add timeout and proper error handling
+        $response = wp_remote_post($this->gemini_endpoint . '?key=' . urlencode($api_key), [
             'headers' => [
                 'Content-Type' => 'application/json',
             ],
@@ -119,33 +135,29 @@ class DG10_AI_Validator {
                     'topK' => 1,
                     'topP' => 0.1
                 ]
-            ])
+            ]),
+            'timeout' => 30,
+            'sslverify' => true
         ]);
 
         if (is_wp_error($response)) {
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Gemini API Error: ' . $response->get_error_message());
-            }
+            $this->log_api_error('Gemini', $response->get_error_message());
             return true; // Allow submission on API error
         }
 
         $response_code = wp_remote_retrieve_response_code($response);
         if ($response_code !== 200) {
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Gemini API HTTP Error: ' . $response_code);
-            }
+            $this->log_api_error('Gemini', 'HTTP Error: ' . $response_code);
             return true; // Allow submission on API error
         }
 
         $body = json_decode(wp_remote_retrieve_body($response), true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Gemini API JSON Error: ' . json_last_error_msg());
-            }
+            $this->log_api_error('Gemini', 'JSON Error: ' . json_last_error_msg());
             return true; // Allow submission on JSON error
         }
         
-        $result = isset($body['candidates'][0]['content']['parts'][0]['text']) ? $body['candidates'][0]['content']['parts'][0]['text'] : '';
+        $result = isset($body['candidates'][0]['content']['parts'][0]['text']) ? sanitize_text_field($body['candidates'][0]['content']['parts'][0]['text']) : '';
         
         return trim($result) !== 'SPAM';
     }
@@ -202,5 +214,52 @@ class DG10_AI_Validator {
             return sanitize_text_field(substr($_SERVER['HTTP_USER_AGENT'], 0, 200));
         }
         return 'unknown';
+    }
+
+    /**
+     * Check rate limiting for API calls
+     */
+    private function check_rate_limit($api_name) {
+        $rate_limit_key = 'dg10_ai_rate_limit_' . $api_name;
+        $rate_limit_data = get_transient($rate_limit_key);
+        
+        if ($rate_limit_data === false) {
+            // No rate limit data, allow request
+            set_transient($rate_limit_key, ['count' => 1, 'reset_time' => time() + 3600], 3600);
+            return true;
+        }
+        
+        $current_time = time();
+        if ($current_time > $rate_limit_data['reset_time']) {
+            // Rate limit window expired, reset
+            set_transient($rate_limit_key, ['count' => 1, 'reset_time' => $current_time + 3600], 3600);
+            return true;
+        }
+        
+        // Check if we're within rate limits (max 100 requests per hour per API)
+        if ($rate_limit_data['count'] >= 100) {
+            return false; // Rate limited
+        }
+        
+        // Increment counter
+        $rate_limit_data['count']++;
+        set_transient($rate_limit_key, $rate_limit_data, $rate_limit_data['reset_time'] - $current_time);
+        
+        return true;
+    }
+
+    /**
+     * Log API errors securely
+     */
+    private function log_api_error($api_name, $error_message) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log(sprintf(
+                'DG10 %s API Error: %s | IP: %s | Time: %s',
+                $api_name,
+                sanitize_text_field($error_message),
+                $this->get_safe_ip(),
+                current_time('mysql')
+            ));
+        }
     }
 }

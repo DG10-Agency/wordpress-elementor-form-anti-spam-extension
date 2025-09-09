@@ -85,6 +85,7 @@ class DG10_Elementor_Silent_Validation {
         $this->form_validator = DG10_Form_Validator::get_instance();
         $this->ip_manager = DG10_IP_Manager::get_instance();
         $this->ai_validator = DG10_AI_Validator::get_instance();
+        // Preset manager, geographic blocker, and time rules are initialized through the admin class
     }
 
     private function init_hooks() {
@@ -100,6 +101,15 @@ class DG10_Elementor_Silent_Validation {
         // Add AJAX handler for frontend validation
         add_action('wp_ajax_dg10_validate_form', [$this, 'ajax_validate_form']);
         add_action('wp_ajax_nopriv_dg10_validate_form', [$this, 'ajax_validate_form']);
+
+        // Admin: handle dismissing notices persistently
+        add_action('wp_ajax_dg10_dismiss_notice', [$this, 'ajax_dismiss_notice']);
+        
+        // WordPress dismissible notices are handled automatically by WordPress core
+        // No custom AJAX handler needed - WordPress handles the dismissal
+        
+        // Enqueue admin scripts
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_scripts']);
     }
 
     // Small delegator to keep reference consistent if Pro is present
@@ -115,19 +125,25 @@ class DG10_Elementor_Silent_Validation {
             wp_send_json_error(['message' => __('Security check failed.', 'dg10-antispam')], 403);
         }
 
+        // Sanitize all POST data before processing
+        $sanitized_data = [
+            'dg10_hp_check' => sanitize_text_field($_POST['dg10_hp_check'] ?? ''),
+            'dg10_submission_time' => absint($_POST['dg10_submission_time'] ?? 0),
+        ];
+
         // Basic validation for Lite mode
         $is_valid = true;
         $errors = [];
 
         // Check honeypot
-        if ($this->settings->get_option('enable_honeypot', true) && !empty($_POST['dg10_hp_check'])) {
+        if ($this->settings->get_option('enable_honeypot', true) && !empty($sanitized_data['dg10_hp_check'])) {
             $is_valid = false;
             $errors[] = __('Honeypot field detected.', 'dg10-antispam');
         }
 
         // Check submission time
         if ($this->settings->get_option('enable_time_check', true)) {
-            $submission_time = absint($_POST['dg10_submission_time'] ?? 0);
+            $submission_time = $sanitized_data['dg10_submission_time'];
             $current_time = time() * 1000;
             $min_time = 3000; // 3 seconds minimum
             
@@ -167,6 +183,43 @@ class DG10_Elementor_Silent_Validation {
         ]);
     }
 
+    public function enqueue_admin_scripts($hook) {
+        // Only enqueue on admin pages
+        if (!is_admin()) {
+            return;
+        }
+
+        // Admin scripts are handled by the admin class
+    }
+
+    // WordPress handles dismissible notices automatically - no custom AJAX handler needed
+
+    /**
+     * Check if a specific notice has been dismissed by the current user
+     */
+    public function is_notice_dismissed($notice_id) {
+        $user_id = get_current_user_id();
+        $dismissed_key = 'dg10_dismissed_notice_' . $notice_id;
+        return (bool) get_user_meta($user_id, $dismissed_key, true);
+    }
+
+    /**
+     * Reset dismissed notices for current user (useful for testing)
+     * 
+     * To test the dismissible notice functionality:
+     * 1. Call this method: DG10_Elementor_Silent_Validation::get_instance()->reset_dismissed_notices();
+     * 2. Refresh the admin dashboard to see the notice again
+     * 3. Click the X button to dismiss it - it should disappear immediately
+     * 4. Refresh again - the notice should not appear
+     * 
+     * Note: This now uses WordPress's built-in dismissible notice system for immediate dismissal
+     */
+    public function reset_dismissed_notices() {
+        $user_id = get_current_user_id();
+        $dismissed_key = 'dismissed_wp_help_point_elementor_pro_missing';
+        delete_user_meta($user_id, $dismissed_key);
+    }
+
     private function check_elementor_pro() {
         return class_exists('\\ElementorPro\\Plugin');
     }
@@ -176,12 +229,53 @@ class DG10_Elementor_Silent_Validation {
             return;
         }
 
+        // Check if user has dismissed this notice
+        if ($this->is_notice_dismissed('elementor_pro_missing')) {
+            return;
+        }
+
         $message = sprintf(
             esc_html__('DG10 Elementor Form Anti-Spam is running in Lite mode. To access server-side validation and advanced features (uses Elementor Pro hooks), please %s.', 'dg10-antispam'),
             '<a href="' . esc_url(admin_url('plugin-install.php?tab=plugin-information&plugin=elementor-pro')) . '">install/activate Elementor Pro</a>'
         );
 
-        printf('<div class="notice notice-info"><p>%s</p></div>', $message);
+        printf('<div class="notice notice-info is-dismissible" data-dismissible="elementor_pro_missing" data-dg10-notice-id="elementor_pro_missing"><p>%s</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">%s</span></button></div>', 
+            $message, 
+            esc_html__('Dismiss this notice.', 'dg10-antispam')
+        );
+    }
+
+    /**
+     * Persist dismissal of admin notices per user
+     */
+    public function ajax_dismiss_notice() {
+        // Verify nonce for security
+        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'dg10_admin')) {
+            wp_send_json_error(['message' => __('Security check failed.', 'dg10-antispam')], 403);
+        }
+
+        // Check user capabilities
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => __('Insufficient permissions.', 'dg10-antispam')], 403);
+        }
+
+        // Sanitize input data
+        $notice_id = sanitize_text_field($_POST['notice_id'] ?? '');
+        
+        // Validate notice ID
+        if (empty($notice_id) || !preg_match('/^[a-zA-Z0-9_-]+$/', $notice_id)) {
+            wp_send_json_error(['message' => __('Invalid notice ID.', 'dg10-antispam')], 400);
+        }
+
+        // Update user meta
+        $user_id = get_current_user_id();
+        $dismissed_key = 'dg10_dismissed_notice_' . $notice_id;
+        
+        if (update_user_meta($user_id, $dismissed_key, 1)) {
+            wp_send_json_success(['message' => __('Notice dismissed successfully.', 'dg10-antispam')]);
+        } else {
+            wp_send_json_error(['message' => __('Failed to dismiss notice.', 'dg10-antispam')], 500);
+        }
     }
 
     public function activate() {
@@ -218,6 +312,30 @@ class DG10_Elementor_Silent_Validation {
         
         flush_rewrite_rules();
     }
+
+    public static function uninstall() {
+        // Remove data only if user opted in
+        $settings = get_option('dg10_antispam_settings', []);
+        $remove = isset($settings['remove_data_on_uninstall']) ? (bool) $settings['remove_data_on_uninstall'] : false;
+        if (!$remove) {
+            return;
+        }
+
+        // Delete plugin options
+        delete_option('dg10_antispam_settings');
+        delete_option('dg10_blocked_attempts');
+        delete_option('dg10_protected_forms');
+        delete_option('dg10_ai_total_checks');
+        delete_option('dg10_ai_spam_detected');
+        delete_option('dg10_country_stats');
+        delete_option('dg10_time_stats');
+
+        // Drop submissions table
+        global $wpdb;
+        $table = $wpdb->prefix . 'dg10_submissions';
+        $wpdb->query("DROP TABLE IF EXISTS {$table}");
+    }
 }
 
 DG10_Elementor_Silent_Validation::get_instance();
+register_uninstall_hook(__FILE__, ['DG10_Elementor_Silent_Validation', 'uninstall']);

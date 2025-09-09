@@ -265,11 +265,9 @@ input[type="checkbox"] {
 .dg10-sidebar-footer {
     margin-top: 8px;
     padding: 10px 12px 0;
-    color: #8a7ab5;
-    font-size: 12px;
-    text-align: center;
-    opacity: 0.9;
 }
+
+/* WordPress handles dismissible notice styling automatically */
 .dg10-sidebar-footer { display:none; }
 
 /* Fine-tune standalone logo sizing per context */
@@ -277,3 +275,528 @@ input[type="checkbox"] {
 .dg10-about .dg10-about-header .dg10-logo { height: 32px; margin: 0 8px 0 0; }
 .dg10-actions { width: 100%; }
 .dg10-cta-button { width: 100%; box-sizing: border-box; min-width: 0; white-space: normal; }
+
+/* Preset Interface Styling */
+.dg10-preset-interface {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin: 20px 0;
+    padding: 24px;
+}
+
+/* Sticky Save Bar */
+.dg10-sticky-savebar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    border-top: 1px solid #e0e0e0;
+    background: #ffffff;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
+}
+.dg10-sticky-savebar .dg10-savebar-text {
+    font-weight: 600;
+    color: #1d2327;
+}
+.dg10-sticky-savebar .dg10-savebar-actions {
+    display: inline-flex;
+    gap: 8px;
+}
+.dg10-save-tip {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.dg10-preset-header {
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.dg10-preset-header h2 {
+    margin: 0 0 8px 0;
+    color: #1d2327;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.dg10-preset-header .description {
+    margin: 0;
+    color: #646970;
+    font-size: 14px;
+}
+
+.dg10-preset-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.dg10-preset-card {
+    background: #fff;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.dg10-preset-card:hover {
+    border-color: #b47cfd;
+    box-shadow: 0 4px 16px rgba(180, 124, 253, 0.15);
+    transform: translateY(-2px);
+}
+
+.dg10-preset-card.is-active {
+    border-color: #b47cfd;
+    background: linear-gradient(135deg, rgba(180, 124, 253, 0.05) 0%, rgba(255, 127, 194, 0.05) 100%);
+    box-shadow: 0 4px 16px rgba(180, 124, 253, 0.2);
+}
+
+.dg10-preset-card.is-recommended {
+    border-color: #00a32a;
+    background: linear-gradient(135deg, rgba(0, 163, 42, 0.05) 0%, rgba(0, 163, 42, 0.02) 100%);
+}
+
+.dg10-preset-card.is-recommended::before {
+    content: "⭐";
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 16px;
+    opacity: 0.7;
+}
+
+.dg10-preset-icon {
+    font-size: 32px;
+    text-align: center;
+    margin-bottom: 16px;
+    line-height: 1;
+}
+
+.dg10-preset-content {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.dg10-preset-content h3 {
+    margin: 0 0 8px 0;
+    color: #1d2327;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.dg10-preset-content p {
+    margin: 0 0 12px 0;
+    color: #646970;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.dg10-preset-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 2px;
+}
+
+.dg10-preset-badge:not(.is-active) {
+    background: #00a32a;
+    color: #fff;
+}
+
+.dg10-preset-badge.is-active {
+    background: linear-gradient(90deg, #ff7fc2 0%, #b47cfd 100%);
+    color: #fff;
+    box-shadow: 0 2px 4px rgba(180, 124, 253, 0.3);
+}
+
+.dg10-preset-actions {
+    text-align: center;
+}
+
+.dg10-preset-actions .button {
+    min-width: 100px;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.dg10-preset-actions .button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.dg10-preset-actions .button-primary {
+    background: linear-gradient(90deg, #ff7fc2 0%, #b47cfd 100%);
+    border-color: #b47cfd;
+    box-shadow: 0 2px 4px rgba(180, 124, 253, 0.3);
+}
+
+.dg10-preset-actions .button-primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(180, 124, 253, 0.4);
+}
+
+.dg10-preset-info {
+    text-align: center;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #b47cfd;
+}
+
+.dg10-preset-info .description {
+    margin: 0;
+    color: #646970;
+    font-size: 13px;
+}
+
+.dg10-preset-info strong {
+    color: #1d2327;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .dg10-preset-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .dg10-preset-card {
+        padding: 16px;
+    }
+    
+    .dg10-preset-interface {
+        padding: 20px;
+        margin: 16px 0;
+    }
+}
+
+/* Animation for preset application */
+.dg10-preset-card.is-applying {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.dg10-preset-card.is-applying .dg10-preset-actions .button {
+    background: #646970;
+    border-color: #646970;
+    color: #fff;
+}
+
+/* Message styling */
+.dg10-preset-message {
+    border-radius: 6px;
+    border-left: 4px solid;
+}
+
+.dg10-preset-message.notice-success {
+    border-left-color: #00a32a;
+    background: #f0f8f0;
+}
+
+.dg10-preset-message.notice-error {
+    border-left-color: #d63638;
+    background: #fef7f7;
+}
+
+/* Geographic Blocking Styling */
+.dg10-country-select {
+    width: 100%;
+    max-width: 400px;
+}
+
+.dg10-country-stats-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.dg10-country-stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.dg10-country-stat-item:last-child {
+    border-bottom: none;
+}
+
+.dg10-country-info {
+    flex: 1;
+}
+
+.dg10-country-info strong {
+    display: block;
+    color: #1d2327;
+    font-size: 13px;
+}
+
+.dg10-country-code {
+    display: inline-block;
+    background: #f0f0f0;
+    color: #646970;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-right: 8px;
+}
+
+.dg10-country-count {
+    color: #646970;
+    font-size: 12px;
+}
+
+.dg10-country-actions {
+    margin-left: 12px;
+}
+
+.dg10-country-actions .button {
+    font-size: 11px;
+    padding: 4px 8px;
+    height: auto;
+    line-height: 1.4;
+}
+
+.dg10-country-actions .dg10-block-country {
+    background: #d63638;
+    border-color: #d63638;
+    color: #fff;
+}
+
+.dg10-country-actions .dg10-block-country:hover {
+    background: #b32d2e;
+    border-color: #b32d2e;
+}
+
+.dg10-country-actions .dg10-unblock-country {
+    background: #00a32a;
+    border-color: #00a32a;
+    color: #fff;
+}
+
+.dg10-country-actions .dg10-unblock-country:hover {
+    background: #007a20;
+    border-color: #007a20;
+}
+
+/* Geographic message styling */
+.dg10-geographic-message {
+    border-radius: 6px;
+    border-left: 4px solid;
+}
+
+.dg10-geographic-message.notice-success {
+    border-left-color: #00a32a;
+    background: #f0f8f0;
+}
+
+.dg10-geographic-message.notice-error {
+    border-left-color: #d63638;
+    background: #fef7f7;
+}
+
+/* Country multiselect styling */
+.dg10-country-select option {
+    padding: 4px 8px;
+}
+
+.dg10-country-select option:checked {
+    background: #b47cfd;
+    color: #fff;
+}
+
+/* Geographic blocking section styling */
+.dg10_antispam_geographic .form-table th {
+    padding: 20px 10px;
+    vertical-align: top;
+}
+
+.dg10_antispam_geographic .form-table td {
+    padding: 20px 10px;
+    vertical-align: top;
+}
+
+/* Responsive adjustments for geographic interface */
+@media (max-width: 768px) {
+    .dg10-country-stat-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .dg10-country-actions {
+        margin-left: 0;
+        align-self: flex-end;
+    }
+}
+
+/* Time-Based Rules Styling */
+.dg10-time-stats-container {
+    margin: 0;
+}
+
+.dg10-current-status {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 16px;
+    border-left: 4px solid #b47cfd;
+}
+
+.dg10-current-status h4 {
+    margin: 0 0 8px 0;
+    color: #1d2327;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.dg10-current-status p {
+    margin: 4px 0;
+    color: #646970;
+    font-size: 13px;
+}
+
+.dg10-recent-activity h4 {
+    margin: 0 0 12px 0;
+    color: #1d2327;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.dg10-time-stats-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.dg10-time-stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.dg10-time-stat-item:last-child {
+    border-bottom: none;
+}
+
+.dg10-time-info {
+    flex: 1;
+}
+
+.dg10-time-info strong {
+    display: block;
+    color: #1d2327;
+    font-size: 13px;
+    margin-bottom: 2px;
+}
+
+.dg10-time-type {
+    display: inline-block;
+    background: #e0e0e0;
+    color: #646970;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-right: 6px;
+}
+
+.dg10-time-status {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.dg10-time-status.is-open {
+    background: #00a32a;
+    color: #fff;
+}
+
+.dg10-time-status.is-closed {
+    background: #d63638;
+    color: #fff;
+}
+
+.dg10-time-count {
+    color: #646970;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Time field styling */
+.dg10-weekend-days {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+}
+
+.dg10-weekend-days label {
+    display: block;
+    margin: 4px 0;
+    font-size: 13px;
+    color: #646970;
+}
+
+.dg10-weekend-days input[type="checkbox"] {
+    margin-right: 6px;
+}
+
+/* Time-based rules section styling */
+.dg10_antispam_time_rules .form-table th {
+    padding: 20px 10px;
+    vertical-align: top;
+}
+
+.dg10_antispam_time_rules .form-table td {
+    padding: 20px 10px;
+    vertical-align: top;
+}
+
+/* Time input styling */
+input[type="time"] {
+    width: 120px;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+/* Responsive adjustments for time interface */
+@media (max-width: 768px) {
+    .dg10-time-stat-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+    
+    .dg10-time-count {
+        align-self: flex-end;
+    }
+    
+    .dg10-current-status {
+        padding: 10px;
+    }
+}
