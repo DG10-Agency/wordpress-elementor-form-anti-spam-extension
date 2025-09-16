@@ -1,4 +1,4 @@
-# Copyright (C) 2024 DG10
+# Copyright (C) 2024 DG10 Agency
 # This file is distributed under the same license as the DG10 Elementor Form Anti-Spam plugin.
 msgid ""
 msgstr ""
@@ -9,29 +9,30 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-03-20T12:00:00+00:00\n"
+"POT-Creation-Date: 2024-12-19T12:00:00+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: dg10-antispam\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. Plugin Name of the plugin
 msgid "DG10 Elementor Form Anti-Spam"
 msgstr ""
 
 #. Plugin URI of the plugin
-msgid "https://example.com/dg10-elementor-form-anti-spam"
+msgid "https://wordpress.org/plugins/dg10-elementor-form-anti-spam/"
 msgstr ""
 
 #. Description of the plugin
-msgid "Advanced anti-spam protection for Elementor forms with intelligent validation, honeypot fields, and customizable settings."
+msgid "Advanced form validation and spam protection for Elementor Pro forms with AI-powered spam detection, honeypot fields, and geographic blocking."
 msgstr ""
 
 #. Author of the plugin
-msgid "DG10"
+msgid "DG10 Agency"
 msgstr ""
 
 #. Author URI of the plugin
-msgid "https://example.com"
+msgid "https://www.dg10.agency"
 msgstr ""
 
 #: includes/class-admin.php:24

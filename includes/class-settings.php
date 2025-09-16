@@ -570,8 +570,33 @@ class DG10_Settings {
     }
 
     public function sanitize_settings($input) {
+        // Check user capabilities
+        if (!current_user_can('manage_options')) {
+            add_settings_error(
+                $this->option_name,
+                'insufficient_permissions',
+                __('You do not have sufficient permissions to save settings.', 'dg10-antispam')
+            );
+            return $this->get_option($this->option_name, []);
+        }
+
+        // Verify nonce for security
+        if (!wp_verify_nonce($_POST['_wpnonce'] ?? '', $this->option_name . '_group')) {
+            add_settings_error(
+                $this->option_name,
+                'invalid_nonce',
+                __('Security check failed. Please try again.', 'dg10-antispam')
+            );
+            return $this->get_option($this->option_name, []);
+        }
+
         // Validate input is array
         if (!is_array($input)) {
+            add_settings_error(
+                $this->option_name,
+                'invalid_input',
+                __('Invalid input data received.', 'dg10-antispam')
+            );
             return $this->get_default_settings();
         }
 
@@ -640,7 +665,32 @@ class DG10_Settings {
         $sanitized['weekend_error_message'] = $this->sanitize_text_field($input['weekend_error_message'] ?? '', 500);
         $sanitized['holiday_error_message'] = $this->sanitize_text_field($input['holiday_error_message'] ?? '', 500);
 
+        // Log settings update
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('DG10 Anti-Spam: Settings updated successfully');
+        }
+
         return $sanitized;
+    }
+
+    /**
+     * Add settings error with proper escaping
+     */
+    private function add_settings_error($code, $message) {
+        add_settings_error(
+            $this->option_name,
+            $code,
+            esc_html($message)
+        );
+    }
+
+    /**
+     * Log error for debugging
+     */
+    private function log_error($message, $context = []) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('DG10 Anti-Spam Error: ' . $message . ' Context: ' . print_r($context, true));
+        }
     }
 
     public function get_frontend_settings() {

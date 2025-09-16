@@ -73,7 +73,7 @@ class DG10_Admin {
 
     public function render_settings_page() {
         if (!current_user_can('manage_options')) {
-            return;
+            wp_die(__('You do not have sufficient permissions to access this page.', 'dg10-antispam'));
         }
 
         $blocked_attempts = $this->get_blocked_attempts();
@@ -83,23 +83,23 @@ class DG10_Admin {
         ?>
         <div class="wrap dg10-admin-container">
             <div class="dg10-header">
-                <img class="dg10-logo" src="<?php echo esc_url(DG10_PLUGIN_URL . 'assets/images/logo.svg'); ?>" alt="<?php echo esc_attr__('DG10', 'dg10-antispam'); ?>">
+                <img class="dg10-logo" src="<?php echo esc_url(DG10_PLUGIN_URL . 'assets/images/logo.svg'); ?>" alt="<?php echo esc_attr__('DG10 Agency Logo', 'dg10-antispam'); ?>" width="40" height="40">
                 <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
             </div>
 
-            <div class="dg10-mode-notice <?php echo $has_pro ? 'is-pro' : 'is-lite'; ?>">
+            <div class="dg10-mode-notice <?php echo $has_pro ? 'is-pro' : 'is-lite'; ?>" role="status" aria-live="polite">
                 <?php if ($has_pro): ?>
                     <p>
                         <strong><?php esc_html_e('Pro mode active', 'dg10-antispam'); ?>.</strong>
                         <?php esc_html_e('Server-side validation, IP throttling, and AI checks are enabled for Elementor Pro forms.', 'dg10-antispam'); ?>
                         <?php esc_html_e('Lite Mode options apply to non-Elementor forms on the site.', 'dg10-antispam'); ?>
-                        <span class="dg10-badge-pro"><?php esc_html_e('Pro', 'dg10-antispam'); ?></span>
+                        <span class="dg10-badge-pro" aria-label="<?php esc_attr_e('Pro version features', 'dg10-antispam'); ?>"><?php esc_html_e('Pro', 'dg10-antispam'); ?></span>
                     </p>
                 <?php else: ?>
                     <p>
                         <strong><?php esc_html_e('Lite mode active', 'dg10-antispam'); ?>.</strong>
                         <?php esc_html_e('Using client-side checks (honeypot, time, basic validation). Features marked require Elementor Pro hooks.', 'dg10-antispam'); ?>
-                        <a href="<?php echo esc_url(admin_url('plugin-install.php?tab=plugin-information&plugin=elementor-pro')); ?>" target="_blank" rel="noopener">
+                        <a href="<?php echo esc_url(admin_url('plugin-install.php?tab=plugin-information&plugin=elementor-pro')); ?>" target="_blank" rel="noopener noreferrer" aria-label="<?php esc_attr_e('Get Elementor Pro (opens in new tab)', 'dg10-antispam'); ?>">
                             <?php esc_html_e('Get Elementor Pro', 'dg10-antispam'); ?>
                         </a>
                     </p>
@@ -113,26 +113,31 @@ class DG10_Admin {
             
             <div class="dg10-admin-content">
                 <div class="dg10-admin-main">
-                    <form action="options.php" method="post">
+                    <form action="options.php" method="post" novalidate>
                         <?php
                         settings_fields($this->settings->get_option_name() . '_group');
                         do_settings_sections('dg10-antispam');
-                        submit_button(__('Save Settings', 'dg10-antispam'));
+                        submit_button(__('Save Settings', 'dg10-antispam'), 'primary', 'submit', false, [
+                            'aria-describedby' => 'save-settings-description'
+                        ]);
                         ?>
+                        <p id="save-settings-description" class="description">
+                            <?php esc_html_e('Click to save your anti-spam settings. Changes will take effect immediately.', 'dg10-antispam'); ?>
+                        </p>
                     </form>
                 </div>
 
                 <div class="dg10-admin-sidebar">
                     <div class="dg10-box">
-                        <h3><?php _e('Usage Statistics', 'dg10-antispam'); ?></h3>
-                        <ul>
+                        <h3><?php esc_html_e('Usage Statistics', 'dg10-antispam'); ?></h3>
+                        <ul role="list" aria-label="<?php esc_attr_e('Plugin usage statistics', 'dg10-antispam'); ?>">
                             <li>
-                                <strong><?php _e('Blocked Attempts:', 'dg10-antispam'); ?></strong>
-                                <span id="dg10-blocked-attempts"><?php echo esc_html($blocked_attempts); ?></span>
+                                <strong><?php esc_html_e('Blocked Attempts:', 'dg10-antispam'); ?></strong>
+                                <span id="dg10-blocked-attempts" aria-label="<?php esc_attr_e('Total blocked spam attempts', 'dg10-antispam'); ?>"><?php echo esc_html($blocked_attempts); ?></span>
                             </li>
                             <li>
-                                <strong><?php _e('Protected Forms:', 'dg10-antispam'); ?></strong>
-                                <span id="dg10-protected-forms"><?php echo esc_html(is_array($protected_forms) ? count($protected_forms) : intval($protected_forms)); ?></span>
+                                <strong><?php esc_html_e('Protected Forms:', 'dg10-antispam'); ?></strong>
+                                <span id="dg10-protected-forms" aria-label="<?php esc_attr_e('Number of protected forms', 'dg10-antispam'); ?>"><?php echo esc_html(is_array($protected_forms) ? count($protected_forms) : intval($protected_forms)); ?></span>
                             </li>
                         </ul>
                     </div>
