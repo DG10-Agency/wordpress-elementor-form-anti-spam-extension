@@ -94,6 +94,10 @@ class DG10_Elementor_Silent_Validation {
         $this->form_validator = DG10_Form_Validator::get_instance();
         $this->ip_manager = DG10_IP_Manager::get_instance();
         $this->ai_validator = DG10_AI_Validator::get_instance();
+        
+        // Initialize security class
+        DG10_Security::get_instance();
+        
         // Preset manager, geographic blocker, and time rules are initialized through the admin class
     }
 

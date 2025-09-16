@@ -167,6 +167,16 @@ class DG10_Preset_Manager {
                 $current_value = (bool) $current_value;
             }
             
+            // Handle array values (like blocked_countries)
+            if (is_array($value) && is_array($current_value)) {
+                sort($value);
+                sort($current_value);
+                if ($value !== $current_value) {
+                    return false;
+                }
+                continue;
+            }
+            
             if ($current_value !== $value) {
                 return false;
             }
